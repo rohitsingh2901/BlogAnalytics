@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog Analytics and Search Tool</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      input,
+      button {
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Blog Analytics</h1>
+
+    <div id="statistics"></div>
+
+    <h1>Blog Search</h1>
+
+    <input required type="text" id="searchTerm" placeholder="Enter search term" />
+    <button onclick="search()">Search</button>
+    <span style="color: red;" id="error">Please enter search term</span>
+
+    <ul id="searchResults"></ul>
+
+  </body>
+  <script>
+      document.getElementById("error").style.display = "none";
+    // Function to fetch blog statistics
+    function fetchBlogStatistics() {
+      fetch("http://127.0.0.1:5000/api/blog-stats")
+        .then((response) => response.json())
+        .then((data) => {
+          const statisticsElement = document.getElementById("statistics");
+          statisticsElement.innerHTML = `
+                <p>Total Posts: ${data.totalPosts}</p>
+       
+                
+                <p>Blog with Longest length title: <br>${data.longestTitleBlog.title}</p>
+                <p>image Url: ${data.longestTitleBlog.image_url}</p>
+                <p>The number of blogs with titles containing the word "privacy": ${data.numPrivacyBlogs}</p>
+              
+            `;
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+
+    // Function to search for blogs
+    function search() {
+      document.getElementById("searchResults").innerHTML = ""
+      if(document.getElementById("searchTerm").value===""){
+        document.getElementById("error").style.display = "block";
+        return;
+      }
+      document.getElementById("error").style.display = "none";
+      const searchTerm = document.getElementById("searchTerm").value;
+
+      fetch(`http://127.0.0.1:5000/api/blog-search?q=${searchTerm}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const searchResultsElement = document.getElementById("searchResults");
+          searchResultsElement.innerHTML = "";
+
+          if (data.length > 0) {
+            data.forEach((post) => {
+              const li = document.createElement("li");
+              li.textContent = post.title;
+              searchResultsElement.appendChild(li);
+            });
+          } else {
+            searchResultsElement.innerHTML = "<p>No results found.</p>";
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+
+    // Fetch blog statistics on page load
+    fetchBlogStatistics();
+  </script>
+</html>
