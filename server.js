@@ -6,7 +6,7 @@ const port = 5000;
 app.use(express.json());
 app.use(cors());
 const axios = require('axios');
-const { getStatistics } = require('./middleware'); // You'll create this middleware in step 3
+const { memoizedGetStatistics } = require('./middleware'); // You'll create this middleware in step 3
 let blogData = [];
 // Define route handler
 app.get('/api/blog-stats', async (req, res) => {
@@ -19,8 +19,7 @@ app.get('/api/blog-stats', async (req, res) => {
     blogData = response.data.blogs; // Assuming the API returns an array of blog posts
 
     // Process blog data using middleware
-    const stats = getStatistics(blogData);
-    console.log(stats)
+    const stats = memoizedGetStatistics (blogData);
     // Send the statistics as the response
     res.json(stats);
   } catch (error) {

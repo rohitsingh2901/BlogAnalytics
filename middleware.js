@@ -27,6 +27,9 @@ function getStatistics(blogData) {
     uniqueTitles
     // Add more statistics as needed
   };
-}
 
-module.exports = { getStatistics };
+}
+// Memoize the getStatistics function with a caching period of 60 seconds (adjust as needed)
+const memoizedGetStatistics = _.memoize(getStatistics, undefined, 60000);
+
+module.exports = { memoizedGetStatistics  };
